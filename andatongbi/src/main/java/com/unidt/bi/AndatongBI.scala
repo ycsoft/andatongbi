@@ -1,7 +1,6 @@
 package com.unidt.bi
 
 import com.unidt.helper.FraHelper
-import org.apache.spark
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.hive.HiveContext
@@ -10,8 +9,6 @@ import org.apache.spark.sql.hive.HiveContext
   * Created by admin on 2018/3/28.
   */
 object AndatongBI {
-
-
 
 
   def sparkAdtBI(): Unit = {
@@ -31,8 +28,7 @@ object AndatongBI {
     hiveContext.sql("set hive.exec.dynamic.partition.mode=nonstrict")
 
     val date = FraHelper.getDate()
-    val pv = hiveContext.sql(f"select count(*) as pv from ods_andatong where p_dt=$date%s").collect()(0)(0).toString.toInt
-    println(f"pv is : $pv%d")
+    hiveContext.sql(f"select count(*) as pv from ods_andatong where p_dt=$date%s").collect().foreach(r => println(r))
 
   }
 
