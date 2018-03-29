@@ -1,7 +1,7 @@
 package com.unidt.bi
 
 import com.unidt.helper.FraHelper
-import org.apache.spark.SparkConf
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.hive.HiveContext
 
@@ -14,11 +14,7 @@ object AndatongBI {
   def sparkAdtBI(): Unit = {
 
     var conf = new SparkConf().setAppName("spark-hive-andatong")
-    val spark = SparkSession.builder().config(conf)
-      .config("hive.exec.dynamic.partition.mode", "nonstrict")
-      .enableHiveSupport()
-      .getOrCreate()
-
+    val spark = SparkSession.builder().config(conf).getOrCreate()
     val hiveContext = new HiveContext(spark.sparkContext)
 
     hiveContext.sql("use andatong")
@@ -28,7 +24,8 @@ object AndatongBI {
     hiveContext.sql("set hive.exec.dynamic.partition.mode=nonstrict")
 
     val date = FraHelper.getDate()
-    hiveContext.sql(f"select count(*) as pv from ods_andatong where p_dt=$date%s").collect().foreach(r => println(r))
+    var sql = f"select count(*) as pv from ods_andatong where p_dt=$date%s"
+    hiveContext.sql(sql).collect().foreach(r => println(r))
 
   }
 
