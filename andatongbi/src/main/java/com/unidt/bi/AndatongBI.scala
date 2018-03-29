@@ -14,8 +14,16 @@ object AndatongBI {
   def sparkAdtBI(): Unit = {
 
     var conf = new SparkConf().setAppName("spark-hive-andatong")
-    val spark = SparkSession.builder().config(conf).getOrCreate()
+    val spark = SparkSession.builder()
+      .config(conf)
+      .enableHiveSupport()
+      .config("hive.exec.dynamic.partition.mode", "nonstrict")
+      .getOrCreate()
+
+    import spark.implicits._
+
     val hiveContext = new HiveContext(spark.sparkContext)
+    import hiveContext._
 
     hiveContext.sql("use andatong")
     hiveContext.sql("set hive.mapred.supports.subdirectories=true")
@@ -26,7 +34,7 @@ object AndatongBI {
     val date = FraHelper.getDate()
     var sql = f"select count(*) as pv from ods_andatong where p_dt=$date%s"
     hiveContext.sql(sql).collect().foreach(r => println(r))
-
+    spark.stop()
   }
 
   def main(args: Array[String]): Unit = {
